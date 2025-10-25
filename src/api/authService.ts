@@ -1,9 +1,13 @@
-import api from './axios.ts';
+
+import usersData from '@/mock-data/data.json';
 import type { User } from '../models/User';
 
 export async function login(username: string, password: string): Promise<User | null> {
-  const response = await api.get<User[]>('/users');
-  const user = response.data.find(u => u.username === username && u.password === password);
+  // Read users from local mock data
+  const users: User[] = usersData.users;
+  const user = users.find(u => u.username === username && u.password === password);
+  // Simulate async
+  await new Promise((resolve) => setTimeout(resolve, 500));
   return user || null;
 }
 
@@ -14,8 +18,9 @@ export async function signup(newUser: Omit<User, 'id'>): Promise<User> {
 }
 
 export async function resetPassword(email: string): Promise<boolean> {
-  // Simulate OTP generation and verification
-  const response = await api.get<User[]>('/users');
-  const user = response.data.find(u => u.email === email);
+  // Simulate OTP generation and verification using local mock data
+  const users: User[] = usersData.users;
+  const user = users.find(u => u.email === email);
+  await new Promise((resolve) => setTimeout(resolve, 500));
   return !!user;
 }

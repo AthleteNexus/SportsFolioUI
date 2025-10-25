@@ -9,6 +9,8 @@ import Friends from "./features/friends/Friends";
 import LoginForm from "./features/auth/LoginForm";
 import SignupForm from "./features/auth/SignupForm";
 import PasswordResetForm from "./features/auth/PasswordResetForm";
+import { useAuth } from "@/app/AuthContext";
+import { Navigate, useLocation } from "react-router-dom";
 
 function NavBar() {
 	const [dark, setDark] = React.useState(() => {
@@ -21,7 +23,7 @@ function NavBar() {
 			return false;
 		}
 	});
-	const [loggedIn, setLoggedIn] = React.useState(false); // Replace with real auth state
+	const { user, logout } = useAuth();
 	const toggleTheme = () => {
 		setDark((d) => {
 			const newDark = !d;
@@ -38,69 +40,83 @@ function NavBar() {
 	return (
 		<nav className="flex items-center justify-between px-6 py-3 bg-gray-900 text-white shadow">
 			<div className="font-bold text-2xl tracking-tight">SportsFolio</div>
-			<ul className="flex gap-6 items-center">
-				<li>
-					<Link to="/feed" className="hover:text-blue-400 transition">
-						Feed
-					</Link>
-				</li>
-				<li>
-					<Link
-						to="/profile"
-						className="hover:text-blue-400 transition"
-					>
-						Profile
-					</Link>
-				</li>
-				<li>
-					<Link
-						to="/tournament"
-						className="hover:text-blue-400 transition"
-					>
-						Tournaments
-					</Link>
-				</li>
-				<li>
-					<Link to="/post" className="hover:text-blue-400 transition">
-						Create Post
-					</Link>
-				</li>
-				<li>
-					<Link
-						to="/friends"
-						className="hover:text-blue-400 transition"
-					>
-						Friends
-					</Link>
-				</li>
-			</ul>
-			<div className="flex items-center gap-3">
-				<button
-					onClick={toggleTheme}
-					className="w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
-				>
-					{dark ? (
-						<Sun className="w-5 h-5" />
-					) : (
-						<Moon className="w-5 h-5" />
-					)}
-				</button>
-				{loggedIn ? (
+			{user ? (
+				<>
+					<ul className="flex gap-6 items-center">
+						<li>
+							<Link
+								to="/feed"
+								className="hover:text-blue-400 transition"
+							>
+								Feed
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/profile"
+								className="hover:text-blue-400 transition"
+							>
+								Profile
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/tournament"
+								className="hover:text-blue-400 transition"
+							>
+								Tournaments
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/post"
+								className="hover:text-blue-400 transition"
+							>
+								Create Post
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/friends"
+								className="hover:text-blue-400 transition"
+							>
+								Friends
+							</Link>
+						</li>
+					</ul>
+					<div className="flex items-center gap-3">
+						<button
+							onClick={toggleTheme}
+							className="w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
+						>
+							{dark ? (
+								<Sun className="w-5 h-5" />
+							) : (
+								<Moon className="w-5 h-5" />
+							)}
+						</button>
+						<button
+							onClick={logout}
+							className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium"
+						>
+							Logout
+						</button>
+					</div>
+				</>
+			) : (
+				<div className="flex items-center gap-3">
 					<button
-						onClick={() => setLoggedIn(false)}
-						className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium"
+						onClick={toggleTheme}
+						className="w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
 					>
-						Logout
+						{dark ? (
+							<Sun className="w-5 h-5" />
+						) : (
+							<Moon className="w-5 h-5" />
+						)}
 					</button>
-				) : (
-					<Link
-						to="/login"
-						className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium"
-					>
-						Login
-					</Link>
-				)}
-			</div>
+				</div>
+			)}
 		</nav>
 	);
 }
@@ -116,21 +132,71 @@ function Footer() {
 	);
 }
 
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+	const { user } = useAuth();
+	const location = useLocation();
+	if (!user) {
+		return <Navigate to="/login" state={{ from: location }} replace />;
+	}
+	return <>{children}</>;
+}
+
 function App() {
+	const { user } = useAuth();
 	return (
 		<div className="flex flex-col min-h-screen">
 			<NavBar />
 			<main className="flex-1">
 				<Routes>
-					<Route path="/feed" element={<Feed />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route path="/tournament" element={<Tournament />} />
-					<Route path="/post" element={<PostForm />} />
-					<Route path="/friends" element={<Friends />} />
 					<Route path="/login" element={<LoginForm />} />
 					<Route path="/signup" element={<SignupForm />} />
 					<Route path="/reset" element={<PasswordResetForm />} />
-					<Route path="*" element={<Feed />} />
+					<Route
+						path="/feed"
+						element={
+							<PrivateRoute>
+								<Feed />
+							</PrivateRoute>
+						}
+					/>
+					<Route
+						path="/profile"
+						element={
+							<PrivateRoute>
+								<Profile />
+							</PrivateRoute>
+						}
+					/>
+					<Route
+						path="/tournament"
+						element={
+							<PrivateRoute>
+								<Tournament />
+							</PrivateRoute>
+						}
+					/>
+					<Route
+						path="/post"
+						element={
+							<PrivateRoute>
+								<PostForm />
+							</PrivateRoute>
+						}
+					/>
+					<Route
+						path="/friends"
+						element={
+							<PrivateRoute>
+								<Friends />
+							</PrivateRoute>
+						}
+					/>
+					<Route
+						path="*"
+						element={
+							user ? <Feed /> : <Navigate to="/login" replace />
+						}
+					/>
 				</Routes>
 			</main>
 			<Footer />

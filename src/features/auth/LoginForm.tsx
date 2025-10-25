@@ -4,15 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert } from "@/components/ui/alert";
 import { login } from "@/api/authService";
+import { useAuth } from "@/app/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm: React.FC = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
+	const { login: loginUser } = useAuth();
+	const navigate = useNavigate();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -23,7 +29,8 @@ const LoginForm: React.FC = () => {
 			setError("Invalid username or password");
 		} else {
 			setError("");
-			// TODO: handle successful login (e.g., set auth state, redirect)
+			loginUser(user, String(user.id));
+			navigate("/feed");
 		}
 	};
 
@@ -46,14 +53,31 @@ const LoginForm: React.FC = () => {
 				</div>
 				<div>
 					<Label htmlFor="password">Password</Label>
-					<Input
-						id="password"
-						type="password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						required
-						className="mt-1"
-					/>
+					<div className="relative">
+						<Input
+							id="password"
+							type={showPassword ? "text" : "password"}
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							required
+							className="mt-1 pr-10"
+						/>
+						<button
+							type="button"
+							className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+							onClick={() => setShowPassword((v) => !v)}
+							tabIndex={-1}
+							aria-label={
+								showPassword ? "Hide password" : "Show password"
+							}
+						>
+							{showPassword ? (
+								<EyeOff size={18} />
+							) : (
+								<Eye size={18} />
+							)}
+						</button>
+					</div>
 				</div>
 				{error && (
 					<Alert variant="destructive" className="mb-2">

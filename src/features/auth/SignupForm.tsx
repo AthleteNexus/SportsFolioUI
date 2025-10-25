@@ -6,13 +6,18 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert } from "@/components/ui/alert";
 import { signup } from "@/api/authService";
+import { Eye, EyeOff } from "lucide-react";
 
 const SignupForm: React.FC = () => {
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
+
+	// Use mock data for signup
+	const usersData = require("@/mock-data/data.json");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -21,7 +26,15 @@ const SignupForm: React.FC = () => {
 			setSuccess("");
 			return;
 		}
-		// TODO: Check for unique username/email using mock data
+		// Check for unique username/email using mock data
+		const exists = usersData.users.some(
+			(u: any) => u.username === username || u.email === email
+		);
+		if (exists) {
+			setError("Username or email already exists.");
+			setSuccess("");
+			return;
+		}
 		const newUser = {
 			username,
 			email,
@@ -67,14 +80,31 @@ const SignupForm: React.FC = () => {
 				</div>
 				<div>
 					<Label htmlFor="password">Password</Label>
-					<Input
-						id="password"
-						type="password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						required
-						className="mt-1"
-					/>
+					<div className="relative">
+						<Input
+							id="password"
+							type={showPassword ? "text" : "password"}
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							required
+							className="mt-1 pr-10"
+						/>
+						<button
+							type="button"
+							className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+							onClick={() => setShowPassword((v) => !v)}
+							tabIndex={-1}
+							aria-label={
+								showPassword ? "Hide password" : "Show password"
+							}
+						>
+							{showPassword ? (
+								<EyeOff size={18} />
+							) : (
+								<Eye size={18} />
+							)}
+						</button>
+					</div>
 				</div>
 				{error && (
 					<Alert variant="destructive" className="mb-2">
