@@ -1,31 +1,113 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Sun, Moon } from "lucide-react";
+import { useAuth } from "@/app/AuthContext";
 
 function NavBar() {
-  const location = useLocation();
-  const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Profile', path: '/profile' },
-    { name: 'Settings', path: '/settings' },
-  ];
-
+  const [dark, setDark] = React.useState(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") {
+      document.documentElement.classList.add("dark");
+      return true;
+    } else {
+      document.documentElement.classList.remove("dark");
+      return false;
+    }
+  });
+  const { user, logout } = useAuth();
+  const toggleTheme = () => {
+    setDark((d) => {
+      const newDark = !d;
+      if (newDark) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return newDark;
+    });
+  };
   return (
-    <nav className="flex items-center justify-between p-4 bg-gray-900 text-white">
-      <div className="font-bold text-2xl">SportsFolio</div>
-      <ul className="flex gap-6 m-0 p-0 list-none">
-        {navItems.map(item => (
-          <li key={item.path}>
-            <Link
-              to={item.path}
-              className={`hover:text-blue-400 transition ${
-                location.pathname === item.path ? 'text-blue-400 font-semibold' : ''
-              }`}
+    <nav className="flex items-center justify-between px-6 py-3 bg-gray-900 text-white shadow">
+      <div className="font-bold text-2xl tracking-tight">SportsFolio</div>
+      {user ? (
+        <>
+          <ul className="flex gap-6 items-center">
+            <li>
+              <Link
+                to="/feed"
+                className="hover:text-blue-400 transition"
+              >
+                Feed
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/profile"
+                className="hover:text-blue-400 transition"
+              >
+                Profile
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/tournament"
+                className="hover:text-blue-400 transition"
+              >
+                Tournaments
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/post"
+                className="hover:text-blue-400 transition"
+              >
+                Create Post
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/friends"
+                className="hover:text-blue-400 transition"
+              >
+                Friends
+              </Link>
+            </li>
+          </ul>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
             >
-              {item.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
+              {dark ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+            <button
+              onClick={logout}
+              className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium"
+            >
+              Logout
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
+          >
+            {dark ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+      )}
     </nav>
   );
 }
