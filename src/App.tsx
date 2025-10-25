@@ -1,13 +1,140 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
+import Feed from "./features/feed/Feed";
+import Profile from "./features/profile/Profile";
+import Tournament from "./features/tournament/Tournament";
+import PostForm from "./features/posts/PostForm";
+import Friends from "./features/friends/Friends";
 import LoginForm from "./features/auth/LoginForm";
+import SignupForm from "./features/auth/SignupForm";
+import PasswordResetForm from "./features/auth/PasswordResetForm";
 
+function NavBar() {
+	const [dark, setDark] = React.useState(() => {
+		const stored = localStorage.getItem("theme");
+		if (stored === "dark") {
+			document.documentElement.classList.add("dark");
+			return true;
+		} else {
+			document.documentElement.classList.remove("dark");
+			return false;
+		}
+	});
+	const [loggedIn, setLoggedIn] = React.useState(false); // Replace with real auth state
+	const toggleTheme = () => {
+		setDark((d) => {
+			const newDark = !d;
+			if (newDark) {
+				document.documentElement.classList.add("dark");
+				localStorage.setItem("theme", "dark");
+			} else {
+				document.documentElement.classList.remove("dark");
+				localStorage.setItem("theme", "light");
+			}
+			return newDark;
+		});
+	};
+	return (
+		<nav className="flex items-center justify-between px-6 py-3 bg-gray-900 text-white shadow">
+			<div className="font-bold text-2xl tracking-tight">SportsFolio</div>
+			<ul className="flex gap-6 items-center">
+				<li>
+					<Link to="/feed" className="hover:text-blue-400 transition">
+						Feed
+					</Link>
+				</li>
+				<li>
+					<Link
+						to="/profile"
+						className="hover:text-blue-400 transition"
+					>
+						Profile
+					</Link>
+				</li>
+				<li>
+					<Link
+						to="/tournament"
+						className="hover:text-blue-400 transition"
+					>
+						Tournaments
+					</Link>
+				</li>
+				<li>
+					<Link to="/post" className="hover:text-blue-400 transition">
+						Create Post
+					</Link>
+				</li>
+				<li>
+					<Link
+						to="/friends"
+						className="hover:text-blue-400 transition"
+					>
+						Friends
+					</Link>
+				</li>
+			</ul>
+			<div className="flex items-center gap-3">
+				<button
+					onClick={toggleTheme}
+					className="w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
+				>
+					{dark ? (
+						<Sun className="w-5 h-5" />
+					) : (
+						<Moon className="w-5 h-5" />
+					)}
+				</button>
+				{loggedIn ? (
+					<button
+						onClick={() => setLoggedIn(false)}
+						className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium"
+					>
+						Logout
+					</button>
+				) : (
+					<Link
+						to="/login"
+						className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 font-medium"
+					>
+						Login
+					</Link>
+				)}
+			</div>
+		</nav>
+	);
+}
+
+function Footer() {
+	return (
+		<footer className="w-full bg-gray-900 text-white text-center py-4 mt-auto shadow-inner">
+			<span className="text-sm">
+				&copy; {new Date().getFullYear()} SportsFolio. All rights
+				reserved.
+			</span>
+		</footer>
+	);
+}
 
 function App() {
 	return (
-		<Routes>
-			<Route path="/login" element={<LoginForm />} />
-		</Routes>
+		<div className="flex flex-col min-h-screen">
+			<NavBar />
+			<main className="flex-1">
+				<Routes>
+					<Route path="/feed" element={<Feed />} />
+					<Route path="/profile" element={<Profile />} />
+					<Route path="/tournament" element={<Tournament />} />
+					<Route path="/post" element={<PostForm />} />
+					<Route path="/friends" element={<Friends />} />
+					<Route path="/login" element={<LoginForm />} />
+					<Route path="/signup" element={<SignupForm />} />
+					<Route path="/reset" element={<PasswordResetForm />} />
+					<Route path="*" element={<Feed />} />
+				</Routes>
+			</main>
+			<Footer />
+		</div>
 	);
 }
 
