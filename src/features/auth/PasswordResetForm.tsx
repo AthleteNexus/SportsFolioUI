@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert } from "@/components/ui/alert";
-import { resetPassword } from "@/api/authService";
+import usersData from "@/mock-data/data.json";
 import { Eye, EyeOff } from "lucide-react";
 
 const PasswordResetForm: React.FC = () => {
@@ -13,9 +13,6 @@ const PasswordResetForm: React.FC = () => {
 	const [showEmail, setShowEmail] = useState(false);
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState("");
-
-	// Use mock data for reset
-	const usersData = require("@/mock-data/data.json");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();

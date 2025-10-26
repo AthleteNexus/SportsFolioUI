@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert } from "@/components/ui/alert";
 import { signup } from "@/api/authService";
 import { Eye, EyeOff } from "lucide-react";
+import usersData from "@/mock-data/data.json";
 
 const SignupForm: React.FC = () => {
 	const [username, setUsername] = useState("");
@@ -15,9 +16,6 @@ const SignupForm: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
-
-	// Use mock data for signup
-	const usersData = require("@/mock-data/data.json");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();

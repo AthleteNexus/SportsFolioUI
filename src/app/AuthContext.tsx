@@ -13,25 +13,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [user, setUser] = useState<User | null>(null);
 	const [token, setToken] = useState<string | null>(
 		localStorage.getItem("token")
 	);
+	const [user, setUser] = useState<User | null>(() => {
+		const stored = localStorage.getItem("user");
+		return stored ? JSON.parse(stored) : null;
+	});
 
 	useEffect(() => {
 		if (token) {
-			// Simulate fetching user from token (mock)
-			setUser({
-				id: 1,
-				username: "demo",
-				email: "demo@example.com",
-				password: "",
-				name: "Demo User",
-				bio: "",
-				sports: [],
-				friends: [],
-				endorsements: [],
-			});
+			// Restore user from localStorage if available
+			const stored = localStorage.getItem("user");
+			if (stored) {
+				setUser(JSON.parse(stored));
+			}
 		} else {
 			setUser(null);
 		}
@@ -41,12 +37,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 		setUser(user);
 		setToken(token);
 		localStorage.setItem("token", token);
+		localStorage.setItem("user", JSON.stringify(user));
 	};
 
 	const logout = () => {
 		setUser(null);
 		setToken(null);
 		localStorage.removeItem("token");
+		localStorage.removeItem("user");
 	};
 
 	return (
