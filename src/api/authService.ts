@@ -1,26 +1,45 @@
-
+import axios from "./axios";
 import usersData from '@/mock-data/data.json';
 import type { User } from '../models/User';
 
-export async function login(username: string, password: string): Promise<User | null> {
-  // Read users from local mock data
-  const users: User[] = usersData.users;
-  const user = users.find(u => u.username === username && u.password === password);
-  // Simulate async
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return user || null;
-}
+const API_URL = "http://localhost:8080";
 
-export async function signup(newUser: Omit<User, 'id'>): Promise<User> {
-  // Simulate user creation
-  // In a real backend, you'd POST to /users
-  return { ...newUser, id: Date.now() };
-}
+export const authService = () => {
+    // Login
+    const doLogin = async (username: string, password: string) => {
+        const response = await axios.post(`${API_URL}/auth/login`, {
+            username,
+            password,
+        });
+        return response.data;
+    }
 
-export async function resetPassword(email: string): Promise<boolean> {
-  // Simulate OTP generation and verification using local mock data
-  const users: User[] = usersData.users;
-  const user = users.find(u => u.email === email);
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return !!user;
-}
+    // Signup
+    const doSignup = async (username: string, password: string, emailId: string) => {
+        const response = await axios.post(`${API_URL}/auth/signup`, {
+            username,
+            password,
+            emailId,
+        });
+        return response.data;
+    }
+
+    // Logout
+    const doLogout = async (username: string) => {
+        await axios.get(`${API_URL}/auth/logout`, {
+            params: { username },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
+            },
+        });
+    }
+
+    const doResetPassword = async (email: string): Promise<boolean> => {
+        // Simulate OTP generation and verification using local mock data
+        const users: User[] = usersData.users;
+        const user = users.find(u => u.email === email);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return !!user;
+    }
+    return { doResetPassword, doLogin, doSignup, doLogout };
+};

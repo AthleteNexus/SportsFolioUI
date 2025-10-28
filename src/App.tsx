@@ -9,18 +9,10 @@ import LoginForm from "./features/auth/LoginForm";
 import SignupForm from "./features/auth/SignupForm";
 import PasswordResetForm from "./features/auth/PasswordResetForm";
 import { useAuth } from "@/app/AuthContext";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import NavBar from "./components/NavBar";
-
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-	const { user } = useAuth();
-	const location = useLocation();
-	if (!user) {
-		return <Navigate to="/login" state={{ from: location }} replace />;
-	}
-	return <>{children}</>;
-}
+import PrivateRoute from "./features/auth/PrivateRoute";
 
 function App() {
 	const { user } = useAuth();

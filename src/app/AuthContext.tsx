@@ -4,7 +4,8 @@ import type { User } from "@/models/User";
 interface AuthContextType {
 	user: User | null;
 	token: string | null;
-	login: (user: User, token: string) => void;
+    refreshToken: string | null;
+	login: (user: User, token: string, refreshToken: string) => void;
 	logout: () => void;
 }
 
@@ -15,6 +16,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 	const [token, setToken] = useState<string | null>(
 		localStorage.getItem("token")
+	);
+    const [refreshToken, setRefreshToken] = useState<string | null>(
+		localStorage.getItem("refreshToken")
 	);
 	const [user, setUser] = useState<User | null>(() => {
 		const stored = localStorage.getItem("user");
@@ -33,22 +37,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 		}
 	}, [token]);
 
-	const login = (user: User, token: string) => {
+	const login = (user: User, token: string, refreshToken: string) => {
 		setUser(user);
 		setToken(token);
+        setRefreshToken(refreshToken);
 		localStorage.setItem("token", token);
+		localStorage.setItem("refreshToken", refreshToken);
 		localStorage.setItem("user", JSON.stringify(user));
 	};
 
 	const logout = () => {
 		setUser(null);
 		setToken(null);
+        setRefreshToken(null);
 		localStorage.removeItem("token");
+		localStorage.removeItem("refreshToken");
 		localStorage.removeItem("user");
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, token, login, logout }}>
+		<AuthContext.Provider value={{ user, token, refreshToken, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

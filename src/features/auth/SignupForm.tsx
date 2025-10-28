@@ -5,9 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert } from "@/components/ui/alert";
-import { signup } from "@/api/authService";
+import { authService } from "@/api/authService";
 import { Eye, EyeOff } from "lucide-react";
-import usersData from "@/mock-data/data.json";
 
 const SignupForm: React.FC = () => {
 	const [username, setUsername] = useState("");
@@ -16,6 +15,7 @@ const SignupForm: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
+    const { doSignup: signup } = authService();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -24,26 +24,19 @@ const SignupForm: React.FC = () => {
 			setSuccess("");
 			return;
 		}
-		// Check for unique username/email using mock data
-		const exists = usersData.users.some(
-			(u: any) => u.username === username || u.email === email
-		);
-		if (exists) {
-			setError("Username or email already exists.");
-			setSuccess("");
-			return;
-		}
-		const newUser = {
-			username,
-			email,
-			password,
-			name: "",
-			bio: "",
-			sports: [],
-			friends: [],
-			endorsements: [],
-		};
-		await signup(newUser);
+        let data;
+        try {
+            data = await signup(username, password, email);
+        } catch (err: unknown) {
+            console.error("Signup error:", err);
+            let message = "An unexpected error occurred.";
+            const anyErr = err as any;
+            message = anyErr.response?.data?.message ?? anyErr.response?.data ?? message;
+            setError(message);
+            setSuccess("");
+            return;
+        }
+		console.log("Signup Response data: ", data);
 		setSuccess("Signup successful! You can now log in.");
 		setError("");
 	};

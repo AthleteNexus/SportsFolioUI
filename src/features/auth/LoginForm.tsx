@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert } from "@/components/ui/alert";
-import { login } from "@/api/authService";
+import { authService } from "@/api/authService";
 import { useAuth } from "@/app/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -19,18 +19,26 @@ const LoginForm: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const { login: loginUser } = useAuth();
 	const navigate = useNavigate();
+	const { doLogin: login } = authService();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
-		const user = await login(username, password);
-		setLoading(false);
-		if (!user) {
-			setError("Invalid username or password");
-		} else {
+		let data;
+		try {
+			data = await login(username, password);
+			setLoading(false);
 			setError("");
-			loginUser(user, String(user.id));
+			loginUser(data.userDTO, data.accessToken, data.refreshToken);
 			navigate("/feed");
+		}catch(err) {
+			console.error("Sign in error:", err);
+            let message = "An unexpected error occurred.";
+            const anyErr = err as any;
+            message = anyErr.response?.data?.message ?? anyErr.response?.data ?? message;
+            setError(message);
+			setLoading(false);
+            return;
 		}
 	};
 
