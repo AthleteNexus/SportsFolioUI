@@ -1,0 +1,73 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "john_doe",
+      "email": "john@example.com",
+      "password": "password123",
+      "name": "John Doe",
+      "bio": "Sports enthusiast.",
+      "sports": [
+        {
+          "name": "Football",
+          "primary": true,
+          "equipment": ["Ball", "Shoes"],
+          "achievements": ["MVP 2023"]
+        }
+      ],
+      "friends": [2],
+      "endorsements": [
+        { "sport": "Football", "by": 2 }
+      ]
+    },
+    {
+      "id": 2,
+      "username": "jane_smith",
+      "email": "jane@example.com",
+      "password": "password456",
+      "name": "Jane Smith",
+      "bio": "Runner and footballer.",
+      "sports": [
+        {
+          "name": "Running",
+          "primary": true,
+          "equipment": ["Shoes"],
+          "achievements": ["City Marathon Winner"]
+        },
+        {
+          "name": "Football",
+          "primary": false,
+          "equipment": ["Ball"],
+          "achievements": []
+        }
+      ],
+      "friends": [1],
+      "endorsements": []
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "userId": 1,
+      "content": "Excited for the new football season!",
+      "images": [],
+      "likes": [2],
+      "comments": [
+        { "userId": 2, "text": "Good luck!" }
+      ],
+      "createdAt": "2025-10-20T10:00:00Z"
+    }
+  ],
+  "tournaments": [
+    {
+      "id": 1,
+      "name": "Autumn League",
+      "sport": "Football",
+      "format": "league",
+      "participants": [1,2],
+      "organizers": [1],
+      "fixtures": [],
+      "invitations": [2]
+    }
+  ]
+}
